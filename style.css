@@ -1,10 +1,15 @@
+h1, h2, h3 {
+  font-family: "Courier New", monospace;
+}
+
 body {
-    font: 20px "Gill Sans", Verdana, sans-serif;
-    line-height: 1.8;
-    color: #000000;
-    background-color: #dcdcdc;
-    padding-top: 0px !important;
-  }
+  font-family: "Work Sans", sans-serif;
+  font-weight: 300;
+  line-height: 1.8;
+  color: #000000;
+  background-color: #ffffff;
+  padding-top: 0px !important;
+}
 
 .textcontainer {
   padding: 2% 10%;;
@@ -23,7 +28,7 @@ a {
 }
 
 nav {
-  background-color: #dcdcdc;
+  background-color: #ffffff;
   color: #EEE7E8;
   padding: 50px 0px;
 }
@@ -41,19 +46,19 @@ nav {
 }
 
 .nav-link {
-  border: 3px outset #a3a3a3;
+  border: 2px outset #000000;
   border-radius: 20px;
-  padding: 10px 30px;
-  background-color: #a3a3a3;
-  color: #EEE7E8;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  color: #000000;
   transition: 0.3s;
 }
 
 .nav-link:hover {
-  border: 3px outset #FFFFFF;
+  border: 2px outset #000000;
   border-radius: 20px;
-  padding: 10px 30px;
-  background-color: #a3a3a3;
+  padding: 10px 25px;
+  background-color: #ffffff;
   transition: 0.3s;
 }
 
