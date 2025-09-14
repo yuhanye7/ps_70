@@ -44,7 +44,7 @@ header {
 }
 
 .nav-links {
-  display: flex;
+  display: flex !important;
   gap: 30px;
   color: black !important;
 }
