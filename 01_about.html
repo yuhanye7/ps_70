@@ -8,7 +8,40 @@
   <!-- Fonts & Styles -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
+
+<style>
+    /* Mouse Trail Styles */
+    .trail-dot {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: black;   
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 50%;
+  z-index: 9999;
+  animation: fadeOut 12s ease-out forwards;  /* 渐变消失 */
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+    #trail-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
 </head>
+
+<body>
+  <!-- Mouse Trail Container -->
+  <div id="trail-container"></div>
 
 <body>
   <div class="container">
@@ -47,5 +80,22 @@
 
   <!-- Bootstrap Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Mouse Trail Script -->
+  <script>
+    const trailContainer = document.getElementById("trail-container");
+
+    document.addEventListener("mousemove", function (e) {
+      const dot = document.createElement("div");
+      dot.classList.add("trail-dot");
+      dot.style.left = `${e.pageX}px`;
+      dot.style.top = `${e.pageY}px`;
+      trailContainer.appendChild(dot);
+
+      setTimeout(() => {
+        dot.remove();
+      }, 600);
+    });
+  </script>
 </body>
 </html>
