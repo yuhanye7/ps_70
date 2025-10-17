@@ -23,7 +23,6 @@
       </nav>
     </header>
 
-
 <!-- Page Content -->
   <div class="textcontainer">
     <br><br>
@@ -34,10 +33,10 @@
       <h5>Assignment: 3D Printed Fidget Cone</h5>
       <p class="margin">For this week's assignment, besides experimenting with 3D printing, I also wanted to enhance my modeling skills in Fusion 360. I followed a YouTube tutorial on how to model a fidget cone, which mainly uses circular patterns and allowed me to explore new tools like the Sweep function. 
       Through this exercise, I became more comfortable navigating different modeling features and began to understand how geometric repetition can be used creatively in design.</p>
-      <a download href='../05_3Ddesign/process/Fidget Cone.stl'>Download STL file</a><br>
-      <a download href='../05_3Ddesign/process/Yuhan Ye.gcode'>Download sliced gcode file</a>
-      
-      <div id="Process" class="carousel slide" data-bs-ride="carousel" style="max-width: 800px; margin-left: 0px;">
+      <a download href='../05_3Ddesign/process/Fidget Cone.stl' style="text-decoration: underline;">Download STL file</a><br>
+      <a download href='../05_3Ddesign/process/Yuhan Ye.gcode' style="text-decoration: underline;">Download sliced gcode file</a>
+
+      <div id="Process" class="carousel slide" data-bs-ride="carousel" style="max-width: 800px;margin-left: -30px;">
         <div class="carousel-inner">
             <div class="carousel-item active">
               <img src="../05_3Ddesign/process/process1.png" class="d-block w-100" alt="process 1">
@@ -75,21 +74,40 @@
             <span class="visually-hidden">Next</span>
           </button>
         </div>
-      
-      <img src="../05_3Ddesign/process/process9.png" alt="final print" class="img-fluid" style="max-width: 800px; margin-top: 10px;" />
+
+      <img src="../05_3Ddesign/process/process9.png" alt="final print" class="img-fluid" style="max-width: 800px; margin-left: -30px;" />
       <br>
       
-    <h5>3D Printing Process</h5>
-    <video width="700px" controls>
-        <source src="../05_3Ddesign/process/3D printing process.mov" type="video/mp4">
-      
-    <h5>Final Outcome</h5>
-    <img src="../05_3Ddesign/process/outcome.JPG" alt="outcome" class="img-fluid" style="max-width: 800px; margin-top: 10px;" />
-    <img src="../05_3Ddesign/process/outcome1.JPG" alt="outcome1" class="img-fluid" style="max-width: 800px; margin-top: 10px;" />
-
-
+    <h5>3D Printing Process</h5><br>
+    <video width="750px" controls>
+        <source src="../05_3Ddesign/process/3D printing process.mov" type="video/mp4" >
+    </video>
+    <br><br>
+    <p class="margin"> I chose to 3D print the fidget cone as a single integrated piece to ensure overall stability and structural integrity while avoiding assembly errors between separate parts. However, after printing, 
+    I found that some of the gaps were slightly fused together, which made the moving parts less flexible. I had to manually cut and loosen them afterward. This made me start to reconsider whether printing the two parts separately and assembling them later might be a better approach for achieving smoother motion and cleaner results.</p>
    
- </main>
+
+    <h5>Final Outcome</h5>
+    <img src="../05_3Ddesign/process/outcome1.JPG" alt="outcome1" class="img-fluid" style="max-width: 700px; margin-top: 10px;" />
+    <br><br>
+    <video width="700px" controls>
+        <source src="../05_3Ddesign/process/3D printing.mov" type="video/mp4" >
+    </video><br><br><br>
+
+  <h5>Assignment: 3D Scanning</h5>
+  <p class="margin">For the 3D scanning part, I chose to use the LiDAR scanner available in the lab. At first, I selected a plush toy keychain as my scanning object. 
+  However, because the toy was soft and lacked a fixed form, the scanner often lost tracking or captured unwanted points when I tried to rotate or reposition it.</p>
+  <img src="../05_3Ddesign/process/rabbit1.JPG" alt="scan1" class="img-fluid" style="max-width: 700px; margin-top: 10px;" /><br>
+  <img src="../05_3Ddesign/process/rabbit4.JPG" alt="scan2" class="img-fluid" style="max-width: 700px; margin-top: 10px;" />
+  
+  <br><br>
+  <p class="margin">To improve the scanning results, I decided to switch to a more rigid object with a clearly defined shape — my 3D-printed fidget cone. However, because its surface pattern was highly repetitive, the scanner still struggled to maintain tracking when I rotated it. 
+  Through this process, I realized that soft, reflective, or repetitive objects are generally unsuitable for 3D scanning, as they make it difficult for the sensor to identify stable reference points.</p>
+  <img src="../05_3Ddesign/process/cone1.JPG" alt="scan1" class="img-fluid" style="max-width: 700px; margin-top: 10px;" /><br>
+  <img src="../05_3Ddesign/process/cone2.JPG" alt="scan2" class="img-fluid" style="max-width: 700px; margin-top: 10px;" />
+
+
+</main>
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
