@@ -38,7 +38,115 @@
       <p class="margin"></p>
 
       <h5>Assignment: Minimum Viable Product for Final Project</h5>
-      <p class="margin"></p>
+      <p class="margin">For this week's MVP, I wanted to build upon my initial bubble machine prototype by adding sound recognition functionality. Previously, I encountered issues with the sound sensor module I was using which was not working. As a result, I replaced it with a MEMS microphone (SPW2430), which provides more accurate analog readings and better captures ambient audio.
+
+To implement the sound-triggered interaction, I set a volume threshold: when the microphone detects a sound that exceeds this threshold, it activates the fan that blows the bubble. I also set a fixed runtime for the motor, so that each sound triggers a single controlled action. Through this process, I was able to test a basic yet working feedback loop between audience input and physical output</p>
+
+<style>
+code {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 10px;
+  display: block;
+  color: #333;
+  font-family: monospace;
+}
+</style>
+
+<pre><code>
+const int micPin = 34;  
+const uint32_t sampleWindowMs = 50;     
+const float clapThresh_mV = 250.0;     
+const uint32_t minRetriggerMs = 400;   
+const uint32_t holdMs = 1000;           
+
+uint32_t winStart, lastTrigger, fanOnSince;
+unsigned int sigMax, sigMin;
+bool fanOn = false;
+
+const int IN1 = 12;  
+const int IN2 = 14;  
+
+void setup() {
+  Serial.begin(115200);
+  analogReadResolution(12);  
+
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  winStart = millis();
+  sigMax = 0;
+  sigMin = 4095;
+}
+
+void loop() {
+  uint32_t now = millis();
+
+  int s = analogRead(micPin);
+  if (s > sigMax) sigMax = s;
+  if (s < sigMin) sigMin = s;
+
+  if (now - winStart >= sampleWindowMs) {
+    unsigned int p2p = (sigMax > sigMin) ? (sigMax - sigMin) : 0;
+    float p2p_mV = p2p * 3300.0f / 4095.0f;
+    Serial.println(p2p_mV);
+
+    if (p2p_mV > clapThresh_mV && (now - lastTrigger) > minRetriggerMs) {
+      fanOn = true;
+      fanOnSince = now;
+      lastTrigger = now;
+      digitalWrite(IN1, HIGH);  
+      digitalWrite(IN2, LOW);
+    }
+
+    if (fanOn && (now - fanOnSince >= holdMs)) {
+      fanOn = false;
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+    }
+
+    winStart = now;
+    sigMax = 0;
+    sigMin = 4095;
+  }
+}
+</code></pre>
+
+<h5>Outcome</h5>
+<img src="../07_outputs/process/wiring.JPG" alt="wiring" class="img-fluid" style="max-width: 700px; "/>
+<br><br>
+ <video controls class="img-fluid" style="max-width: 700px;">
+        <source src="../07_outputs/process/Outcome.mov" type="video/mp4">
+      </video><br><br>
+
+      <h5>Feedback from Design Review:</h5>
+
+<div class="margin">
+  <p><strong>Design &amp; Aesthetics</strong></p>
+  <ul>
+    <li>Consider 3D printing the bubble ring for better precision and consistency.</li>
+    <li>Change the material of the bubble ring, e.g. using acrylic for durability and aesthetic clarity.</li>
+    <li>Add LED lights to the bubble ring to enhance visual feedback and interaction.</li>
+  </ul>
+
+  <p><strong>Mechanics &amp; Functionality</strong></p>
+  <ul>
+    <li>The fan is too strong, making it hard to form stable bubbles — consider switching to a low-pressure air pump instead.</li>
+    <li>There are too many mechanical actions happening at once: try simplifying the mechanism to one bubble per trigger.</li>
+    <li>Rethink the sequencing/timing of the bubble-forming mechanism, ideally one clean cycle per sound.</li>
+  </ul>
+
+  <p><strong>Interaction &amp; Experience</strong></p>
+  <ul>
+    <li>Explore ways to make the bubble respond to rhythm and music — “one beat = one bubble”, mimicking the feel of percussion or drumming.</li>
+    <li>Think about what will encourage the audience to speak (use inviting, playful, or reactive cues).</li>
+    <li>Consider having multiple people speaking at once, using bubbles to communicate.</li>
+  </ul>
+</div>
+  </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
