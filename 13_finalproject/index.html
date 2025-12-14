@@ -78,7 +78,7 @@
         <a href="https://youtu.be/fHHo3jQGfHA" target="_blank" >
           https://youtu.be/fHHo3jQGfHA</a>
         
-        <br><br>  
+        <br><br><br><br>
         <h3>Material & Components</h3>
         <ul>
           <li>Arduino ESP32</li>
@@ -88,6 +88,7 @@
           <li>Bubble Ring & Bubble Solution</li>
           <li>3D printed fan</li>
           <li>Acrylic Board</li>
+          <li>Acrylic Container (Amazon)</li>
         </ul>
         <br>
         <h3>Process</h3>
@@ -123,6 +124,199 @@
             <span class="visually-hidden">Next</span>
           </button>
         </div>
+
+        <p class="margin">For the structure of the bubble machine, instead of using tape and hot glue to stabalize the 
+        stick and the bubble ring in my previous iteration. I decided to design a connected structure which can avoid the tiltness of the stick.
+        And also for the audience experience, I also designed a stand for the microphone, so that the intention of my project will be cleaer and 
+        which also easier for audience to interact with.</p>
+
+        <div id="Bubble_process" class="carousel slide" data-bs-ride="carousel" style="max-width: 800px;margin-left: -30px;">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../13_finalproject/process/Model 1.png" class="d-block w-100" alt="bubble process 1">
+            </div>
+            <div class="carousel-item">
+              <img src="../13_finalproject/process/Model 2.png" class="d-block w-100" alt="bubble process 2">
+            </div>
+            <div class="carousel-item">
+              <img src="../13_finalproject/process/Model 3.png" class="d-block w-100" alt="bubble process 3">
+            </div>
+            <div class="carousel-item">
+              <img src="../13_finalproject/process/Model 4.png" class="d-block w-100" alt="bubble process 4">
+            </div>
+          </div>
+
+           <button class="carousel-control-prev" type="button" data-bs-target="#Bubble_process" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+
+          <button class="carousel-control-next" type="button" data-bs-target="#Bubble_process" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+
+        <p class="margin">For the sound detatction part, I used i2s microphone which is more sensitive, but I found that when I put the microphone
+        too close to the motor, it will create a feedback loop. When motor is activated, the sound of it will keep feeding into the microphone, causing
+        the constant sipping of the fan. So I decided to isolate and dislocate the microphone. 
+        <br>Also I found it challenging to find the exact threshold of the volume. Because in the design fair, it will be a louder environment, so I use the 
+        serial plotter to observe the peak volume of the environment, and therefore the threshold will be slightly higher than that.
+        </p>
+
+<style>
+code {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 10px;
+  display: block;
+  color: #333;
+  font-family: monospace;
+}
+</style>
+
+<pre><code>
+#include <Arduino.h>
+#include <driver/i2s.h>
+
+// i2s mic pins 
+#define I2S_WS   25   // LRCL
+#define I2S_SCK  26   // BCLK
+#define I2S_SD   33   // DOUT
+
+#define I2S_PORT I2S_NUM_0
+
+// Fan motor pins (OUT1/OUT2) 
+const int IN1 = 12;  
+const int IN2 = 14;  
+
+// Yellow motor (OUT3/OUT4 + ENB) 
+const int IN3 = 16;    
+const int IN4 = 17;    
+const int ENB = 18;    
+
+// bubble-ring speed
+const int BUBBLE_SPEED = 200;   
+
+// Sound detection parameters
+const uint32_t sampleWindowMs = 50;
+const float clapThresh_mV = 800.0;
+const uint32_t minRetriggerMs = 400;
+const uint32_t holdMs = 15000;
+
+uint32_t winStart, lastTrigger, fanOnSince;
+unsigned int sigMax, sigMin;
+bool fanOn = false;
+
+void i2s_install() {
+  const i2s_config_t i2s_config = {
+    .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX),
+    .sample_rate = 16000,
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .communication_format = I2S_COMM_FORMAT_I2S,
+    .intr_alloc_flags = 0,
+    .dma_buf_count = 4,
+    .dma_buf_len = 64,
+    .use_apll = false
+  };
+
+  i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
+}
+
+void i2s_setpin() {
+  const i2s_pin_config_t pin_config = {
+    .bck_io_num = I2S_SCK,
+    .ws_io_num = I2S_WS,
+    .data_out_num = -1,
+    .data_in_num = I2S_SD
+  };
+  i2s_set_pin(I2S_PORT, &pin_config);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Fan Motor pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  // Yellow motor pins
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  // motor direction
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+
+  analogWrite(ENB, BUBBLE_SPEED);
+
+  Serial.println("Bubble motor running at speed 200.");
+
+  i2s_install();
+  i2s_setpin();
+  i2s_start(I2S_PORT);
+
+  winStart = millis();
+  sigMax = 0;
+  sigMin = 4095;
+}
+
+void loop() {
+  uint32_t now = millis();
+
+  // --- Read I2S sample ---
+  int32_t sample = 0;
+  size_t bytesRead = 0;
+  i2s_read(I2S_PORT, &sample, sizeof(sample), &bytesRead, portMAX_DELAY);
+
+  sample >>= 14; // convert to 18-bit
+  int s = abs(sample);
+  if (s > sigMax) sigMax = s;
+  if (s < sigMin) sigMin = s;
+
+  if (now - winStart >= sampleWindowMs) {
+    unsigned int p2p = sigMax - sigMin;
+    float p2p_mV = p2p * 3300.0 / 262144; // 18-bit range
+    Serial.println(p2p_mV);
+
+    // sound detected
+    if (p2p_mV > clapThresh_mV && (now - lastTrigger) > minRetriggerMs) {
+      fanOn = true;
+      fanOnSince = now;
+      lastTrigger = now;
+
+      // turn ON fan
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+    }
+
+    // auto turn off fan
+    if (fanOn && (now - fanOnSince > holdMs)) {
+      fanOn = false;
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+    }
+
+    winStart = now;
+    sigMax = 0;
+    sigMin = 4095;
+  }
+}
+    </code></pre>
+
+    <h3>Reflection</h3>
+    <p class="margin">For the final outcome, it can detact the certain level of volume and activate the fan. But the bubble doesn't create smoothly and constanly,
+      I found out that is because of the design or the position of the fan. The wind doesn't come through in the center, it comes from the outter area of the fan. 
+      So when the hoop rotate to the center, it doesn't receive enough wind to blow the bubble. So for improvement, I will adjust the postion of the fan, or change 
+      the angle of the fan's blade to make the air flow more cnetered.
+      <br> For the sound detaction part, it only detacts the volume right now. In the future, I want to add more fuctions and details, such as the speed/diration of the 
+      fan spinning can be based on the speed/time of the sound. 
+    </p>
+
 
 
 
